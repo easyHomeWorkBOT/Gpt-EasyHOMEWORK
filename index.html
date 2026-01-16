@@ -104,23 +104,38 @@ const imageUpload = document.getElementById("imageUpload");
 const chatList = document.getElementById("chatList");
 const searchChat = document.getElementById("searchChat");
 
-let chats = [];
+let chats = JSON.parse(localStorage.getItem("chats") || "[]");
+let messagesHistory = JSON.parse(localStorage.getItem("messages") || "[]");
 
-function addMessage(text, type) {
+// Завантаження історії при старті
+messagesHistory.forEach(m => addMessage(m.text, m.type, false));
+updateChatList();
+
+function addMessage(text, type, save=true) {
   const div = document.createElement("div");
   div.className = `message ${type}`;
   div.innerText = text;
   messages.appendChild(div);
   messages.scrollTop = messages.scrollHeight;
+  
   if(type === "user") {
     chats.push(text);
-    updateChatList();
+    if(save) {
+      messagesHistory.push({text,type});
+      localStorage.setItem("chats", JSON.stringify(chats));
+      localStorage.setItem("messages", JSON.stringify(messagesHistory));
+      updateChatList();
+    }
+  }
+  if(type === "bot" && save) {
+    messagesHistory.push({text,type});
+    localStorage.setItem("messages", JSON.stringify(messagesHistory));
   }
 }
 
 function updateChatList() {
   chatList.innerHTML = "";
-  chats.forEach((c) => {
+  chats.forEach(c => {
     const div = document.createElement("div");
     div.innerText = c;
     div.style.cursor = "pointer";
@@ -150,7 +165,7 @@ imageUpload.onchange = () => {
 searchChat.oninput = () => {
   const term = searchChat.value.toLowerCase();
   chatList.innerHTML = "";
-  chats.filter(c=>c.toLowerCase().includes(term)).forEach(c=>{
+  chats.filter(c => c.toLowerCase().includes(term)).forEach(c => {
     const div = document.createElement("div");
     div.innerText = c;
     div.style.cursor="pointer";
@@ -162,6 +177,8 @@ searchChat.oninput = () => {
 document.getElementById("newChat").onclick = () => {
   messages.innerHTML="";
   input.value="";
+  messagesHistory = [];
+  localStorage.setItem("messages", JSON.stringify(messagesHistory));
 };
 </script>
 </body>
