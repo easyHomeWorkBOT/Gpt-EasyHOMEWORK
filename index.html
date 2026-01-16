@@ -1,23 +1,94 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-  <meta charset="UTF-8">
-  <title>Easy Homework GPT</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<title>Easy Homework GPT</title>
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #6a00ff, #9d4edd);
+  height: 100vh;
+}
+.app {
+  display: flex;
+  height: 100vh;
+}
+.sidebar {
+  width: 260px;
+  background: rgba(0,0,0,0.3);
+  color: white;
+  padding: 15px;
+}
+.sidebar h2 {
+  margin-top: 0;
+}
+.sidebar button {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  background: #7b2cff;
+  border: none;
+  color: white;
+  border-radius: 8px;
+}
+.chat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #f4f4f4;
+}
+#messages {
+  flex: 1;
+  padding: 15px;
+  overflow-y: auto;
+}
+.message {
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 10px;
+}
+.user {
+  background: #d0bfff;
+  align-self: flex-end;
+}
+.bot {
+  background: #ffffff;
+}
+.input-area {
+  display: flex;
+  padding: 10px;
+  background: white;
+}
+.input-area input[type="text"] {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+.input-area input[type="file"] {
+  margin-right: 10px;
+}
+.input-area button {
+  margin-left: 10px;
+  padding: 10px 15px;
+  border: none;
+  background: #6a00ff;
+  color: white;
+  border-radius: 8px;
+}
+</style>
 </head>
 <body>
-
 <div class="app">
   <aside class="sidebar">
     <h2>Easy Homework GPT</h2>
     <button id="newChat">+ Новий чат</button>
-    <input type="text" placeholder="Пошук у чатах">
-    <div class="chats"></div>
+    <input type="text" id="searchChat" placeholder="Пошук у чатах">
+    <div class="chats" id="chatList"></div>
   </aside>
-
   <main class="chat">
     <div id="messages"></div>
-
     <div class="input-area">
       <input type="file" id="imageUpload" accept="image/*">
       <input type="text" id="userInput" placeholder="Напиши питання...">
@@ -25,7 +96,75 @@
     </div>
   </main>
 </div>
+<script>
+const messages = document.getElementById("messages");
+const input = document.getElementById("userInput");
+const send = document.getElementById("send");
+const imageUpload = document.getElementById("imageUpload");
+const chatList = document.getElementById("chatList");
+const searchChat = document.getElementById("searchChat");
 
-<script src="script.js"></script>
+let chats = [];
+
+function addMessage(text, type) {
+  const div = document.createElement("div");
+  div.className = `message ${type}`;
+  div.innerText = text;
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
+  if(type === "user") {
+    chats.push(text);
+    updateChatList();
+  }
+}
+
+function updateChatList() {
+  chatList.innerHTML = "";
+  chats.forEach((c,i) => {
+    const div = document.createElement("div");
+    div.innerText = c;
+    div.style.cursor = "pointer";
+    div.onclick = () => {
+      input.value = c;
+    };
+    chatList.appendChild(div);
+  });
+}
+
+send.onclick = () => {
+  if(!input.value) return;
+  addMessage(input.value,"user");
+  setTimeout(()=> {
+    addMessage("Я Easy Homework GPT 🤖. Відповідь з’явиться тут.", "bot");
+  },600);
+  input.value="";
+};
+
+imageUpload.onchange = () => {
+  if(imageUpload.files.length === 0) return;
+  addMessage("Фото завантажено: " + imageUpload.files[0].name, "user");
+  setTimeout(()=> {
+    addMessage("Обробка фото... (тестова відповідь)", "bot");
+  },800);
+  imageUpload.value="";
+};
+
+searchChat.oninput = () => {
+  const term = searchChat.value.toLowerCase();
+  chatList.innerHTML = "";
+  chats.filter(c=>c.toLowerCase().includes(term)).forEach(c=>{
+    const div = document.createElement("div");
+    div.innerText = c;
+    div.style.cursor="pointer";
+    div.onclick = () => { input.value = c };
+    chatList.appendChild(div);
+  });
+};
+
+document.getElementById("newChat").onclick = () => {
+  messages.innerHTML="";
+  input.value="";
+};
+</script>
 </body>
 </html>
