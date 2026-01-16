@@ -120,13 +120,11 @@ function addMessage(text, type) {
 
 function updateChatList() {
   chatList.innerHTML = "";
-  chats.forEach((c,i) => {
+  chats.forEach((c) => {
     const div = document.createElement("div");
     div.innerText = c;
     div.style.cursor = "pointer";
-    div.onclick = () => {
-      input.value = c;
-    };
+    div.onclick = () => { input.value = c; };
     chatList.appendChild(div);
   });
 }
@@ -156,7 +154,7 @@ searchChat.oninput = () => {
     const div = document.createElement("div");
     div.innerText = c;
     div.style.cursor="pointer";
-    div.onclick = () => { input.value = c };
+    div.onclick = () => { input.value = c; };
     chatList.appendChild(div);
   });
 };
